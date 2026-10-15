@@ -24,6 +24,7 @@ import {
 
 /** 站点默认布局配置，和原 AppLayout 中保持一致 */
 export const DEFAULT_LAYOUT: Required<LayoutConfig> = {
+	layoutStyle: "default",
 	maxWidth: "1400px",
 	contentPaddingLeft: "8px",
 	contentPaddingRight: "16px",

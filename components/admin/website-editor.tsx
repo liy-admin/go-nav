@@ -19,6 +19,7 @@ import {
 } from "react-icons/bi";
 import type {
 	CardStyle,
+	LayoutStyle,
 	LayoutConfig,
 	ThemeMode,
 	NavConfig,
@@ -337,8 +338,47 @@ function ThemeEditor({
 		onPatch({ layout: { ...(value.layout ?? {}), cardStyle } });
 	};
 
+	const patchLayoutStyle = (layoutStyle: LayoutStyle) => {
+		onPatch({ layout: { ...(value.layout ?? {}), layoutStyle } });
+	};
+
 	return (
 		<div className="flex flex-col gap-4">
+			<div>
+				<h3 className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
+					首页布局
+				</h3>
+				<p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
+					默认布局为左侧分类栏；门户风格取消侧栏，改为顶部分类导航，每个分类是一个带子分类标签和"更多"的板块。
+				</p>
+			</div>
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+				{(
+					[
+						{ key: "default" as LayoutStyle, label: "侧栏布局" },
+						{ key: "portal" as LayoutStyle, label: "门户风格" },
+					] as const
+				).map((item) => {
+					const active = (value.layout?.layoutStyle ?? "default") === item.key;
+					return (
+						<button
+							key={item.key}
+							type="button"
+							onClick={() => patchLayoutStyle(item.key)}
+							className={`cursor-pointer rounded-2xl border p-4 text-left text-sm font-semibold transition-all ${
+								active
+									? "border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-950/40 dark:text-blue-200"
+									: "border-gray-200 hover:border-gray-300 hover:bg-gray-50 dark:border-neutral-800 dark:hover:border-neutral-700 dark:hover:bg-neutral-900"
+							}`}
+						>
+							{item.label}
+						</button>
+					);
+				})}
+			</div>
+
+			<Separator />
+
 			<div>
 				<h3 className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
 					主题模式

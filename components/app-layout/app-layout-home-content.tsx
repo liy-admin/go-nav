@@ -4,6 +4,7 @@ import type { AdConfig, LayoutConfig } from "@/types";
 import { AdBanner } from "../ad-banner";
 import { CategorySection } from "../category-section";
 import { RecentVisits } from "../recent-visits";
+import { PortalHome } from "../portal/portal-home";
 import { PageEmptyState } from "../ui/empty-state-blocks";
 import type { AppLayoutViewModel } from "./app-layout.types";
 
@@ -80,6 +81,16 @@ export function AppLayoutHomeContent({
 				/>
 			) : null}
 
+			{layout.layoutStyle === "portal" ? (
+				<PortalHome
+					categories={displayCategories
+						.filter((item) => !item.isChild)
+						.map((item) => item.category)}
+					cards={cardGrid}
+					layout={layout}
+					sectionsStyle={sectionsStyle}
+				/>
+			) : (
 			<div style={sectionsStyle}>
 				{displayCategories.map((item) => (
 					<CategorySection
@@ -90,6 +101,7 @@ export function AppLayoutHomeContent({
 					/>
 				))}
 			</div>
+			)}
 		</>
 	);
 }

@@ -13,6 +13,9 @@ export type ThemeMode = "light" | "dark" | "system";
  */
 export type CardStyle = "compact" | "preview";
 
+/** 首页布局风格："default" 侧栏导航，"portal" 门户风格（顶部分类导航 + 板块式分区） */
+export type LayoutStyle = "default" | "portal";
+
 /**
  * 上传图片处理策略
  */
@@ -35,6 +38,8 @@ export interface ImageUploadConfig {
  * 布局与显示配置
  */
 export interface LayoutConfig {
+	/** 首页布局风格："default" 左侧栏 + 分类列表，"portal" 门户风格（类似 2828.io） */
+	layoutStyle?: LayoutStyle;
 	/** 内容区最大宽度，如 "1200px"、"1400px"、"100%"（不限制） */
 	maxWidth?: string;
 	/** 内容区右侧内边距，如 "16px"、"24px" */
