@@ -6,6 +6,7 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { BiBookmarkPlus } from "react-icons/bi";
 import {
+	categoriesAtom,
 	hasIntranetSitesAtom,
 	layoutAtom,
 	navQrCodeAtom,
@@ -42,6 +43,11 @@ export const FloatingActions = memo(function FloatingActions({
 	const qrCodeText = useAtomValue(navQrCodeTextAtom);
 	const layout = useAtomValue(layoutAtom);
 	const hasIntranetSites = useAtomValue(hasIntranetSitesAtom);
+	const categories = useAtomValue(categoriesAtom);
+	/** 导入的 2828.io 分类（id 以 "2828-" 开头），作为"海外网站"入口的跳转目标 */
+	const overseasCategoryId = categories.find((item) =>
+		item.id.startsWith("2828-"),
+	)?.id;
 	const setSubmissionOpen = useSetAtom(submissionDialogOpenAtom);
 	const autoUseIntranet = layout.autoUseIntranet === true;
 	const [showTop, setShowTop] = useState(false);
@@ -123,6 +129,13 @@ export const FloatingActions = memo(function FloatingActions({
 		if (supportsHover) return;
 		setShowQrPanel((prev) => !prev);
 	}, [supportsHover]);
+
+	const goToOverseas = useCallback(() => {
+		if (!overseasCategoryId) return;
+		document
+			.getElementById(overseasCategoryId)
+			?.scrollIntoView({ behavior: "smooth", block: "start" });
+	}, [overseasCategoryId]);
 
 	const goToGithub = useCallback(() => {
 		window.open(
@@ -271,6 +284,42 @@ export const FloatingActions = memo(function FloatingActions({
 						</svg>
 					)}
 				</Button>
+			)}
+
+			{showActions && overseasCategoryId && (
+				<button
+					type="button"
+					aria-label="海外网站"
+					onClick={goToOverseas}
+					className={`group flex cursor-pointer flex-col items-center gap-1 rounded-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
+				>
+					<span
+						className={`flex size-12 items-center justify-center rounded-full bg-linear-to-br from-sky-400 to-blue-600 text-white shadow-[0_6px_16px_rgba(37,99,235,0.35)] ${FLOATING_ACTION_TRANSITION_CLASS} duration-300 [@media(hover:hover)]:group-hover:-translate-y-0.5 [@media(hover:hover)]:group-hover:shadow-[0_10px_22px_rgba(37,99,235,0.45)]`}
+					>
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							aria-hidden="true"
+							className="size-6"
+						>
+							<circle
+								cx="12"
+								cy="12"
+								r="9"
+								stroke="currentColor"
+								strokeWidth="1.8"
+							/>
+							<path
+								d="m15.8 8.2-2.1 5.5-5.5 2.1 2.1-5.5 5.5-2.1Z"
+								fill="currentColor"
+							/>
+							<circle cx="12" cy="12" r="1.1" className="fill-blue-600" />
+						</svg>
+					</span>
+					<span className="text-[11px] leading-none font-medium text-foreground/80">
+						海外网站
+					</span>
+				</button>
 			)}
 
 			{showActions && <Button
