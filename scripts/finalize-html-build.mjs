@@ -33,6 +33,10 @@ if (!fs.existsSync(path.join(outputDir, "index.html"))) {
 for (const baseName of ["nav", "website"]) {
 	const source = resolveStructuredFile(baseName);
 	const data = parseStructuredFile(source);
+	// html 模式不支持访问保护；公开的 nav.json 不能带上密码哈希，避免被离线爆破。
+	if (baseName === "nav" && data && typeof data === "object") {
+		delete data.accessProtection;
+	}
 	const destination = path.join(outputDir, `${baseName}.json`);
 	fs.writeFileSync(destination, `${JSON.stringify(data, null, 2)}\n`, "utf8");
 	console.log(`[build:html] ✔ 已生成 ${destination}`);

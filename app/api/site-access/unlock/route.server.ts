@@ -6,14 +6,13 @@ import {
 } from "@/lib/server/auth";
 import { readNav } from "@/lib/server/store";
 import { verifySiteAccessPassword } from "@/lib/server/site-access";
+import { createFailureLimiter, getClientKey } from "@/lib/server/rate-limit";
 
-const MAX_FAILURES = 10;
-const FAILURE_WINDOW_MS = 10 * 60 * 1000;
-const failures = new Map<string, { count: number; resetAt: number }>();
+const unlockLimiter = createFailureLimiter(10, 10 * 60 * 1000);
 
 export async function POST(req: Request) {
-	const key = getRequestKey(req);
-	const retryAfter = getRetryAfter(key);
+	const key = getClientKey(req);
+	const retryAfter = unlockLimiter.retryAfter(key);
 	if (retryAfter > 0) {
 		return NextResponse.json(
 			{ error: "尝试次数过多，请稍后再试" },
@@ -34,7 +33,7 @@ export async function POST(req: Request) {
 
 	const accessProtection = readNav().accessProtection;
 	if (accessProtection?.enabled !== true) {
-		failures.delete(key);
+		unlockLimiter.reset(key);
 		const response = NextResponse.json({ ok: true });
 		clearAccessCookie(response);
 		return response;
@@ -53,11 +52,11 @@ export async function POST(req: Request) {
 		password.length > 128 ||
 		!verifySiteAccessPassword(password, passwordHash)
 	) {
-		recordFailure(key);
+		unlockLimiter.fail(key);
 		return NextResponse.json({ error: "访问密码错误" }, { status: 401 });
 	}
 
-	failures.delete(key);
+	unlockLimiter.reset(key);
 	const response = NextResponse.json({ ok: true });
 	response.cookies.set(
 		SITE_ACCESS_COOKIE,
@@ -71,36 +70,6 @@ export async function POST(req: Request) {
 		},
 	);
 	return response;
-}
-
-function getRequestKey(req: Request): string {
-	const forwarded = req.headers.get("x-forwarded-for");
-	return (
-		forwarded?.split(",")[0]?.trim() ||
-		req.headers.get("x-real-ip")?.trim() ||
-		"unknown"
-	);
-}
-
-function getRetryAfter(key: string): number {
-	const entry = failures.get(key);
-	if (!entry) return 0;
-	if (entry.resetAt <= Date.now()) {
-		failures.delete(key);
-		return 0;
-	}
-	if (entry.count < MAX_FAILURES) return 0;
-	return Math.max(1, Math.ceil((entry.resetAt - Date.now()) / 1000));
-}
-
-function recordFailure(key: string) {
-	const now = Date.now();
-	const entry = failures.get(key);
-	if (!entry || entry.resetAt <= now) {
-		failures.set(key, { count: 1, resetAt: now + FAILURE_WINDOW_MS });
-		return;
-	}
-	entry.count += 1;
 }
 
 function isSecureRequest(req: Request): boolean {

@@ -5,7 +5,7 @@ import { Label, SearchField } from "@heroui/react";
 import { useState } from "react";
 import { recordVisit } from "@/hooks/use-recent-visits";
 import { openSiteWithPreference } from "@/lib/client/site-link";
-import { withAuthorBaiduTracking } from "@/lib/external-url";
+import { isScriptableUrl, withAuthorBaiduTracking } from "@/lib/external-url";
 import type { HeaderEngineState, HeaderSearchConfig } from "../header.types";
 import { SearchBarEngineSelect } from "./search-bar-engine-select";
 import { SearchLocalResultsPanel } from "./search-local-results-panel";
@@ -87,6 +87,7 @@ export function SearchBar({
 		const url = withAuthorBaiduTracking(
 			engine.url.replace("{query}", encodeURIComponent(q)),
 		);
+		if (isScriptableUrl(url)) return;
 		if (layout?.linkTarget === "current") {
 			window.location.href = url;
 		} else {

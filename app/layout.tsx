@@ -47,7 +47,7 @@ export function generateMetadata(): Metadata {
 function getThemeScript(mode: string) {
 	// 此脚本会被注入到 <head> 中同步执行
 	return `(function(){
-  var m="${mode}";
+  var m="${mode === "dark" || mode === "system" ? mode : "light"}";
   var d=document.documentElement;
   function apply(dark){
     if(dark){d.classList.add("dark");d.style.colorScheme="dark"}
