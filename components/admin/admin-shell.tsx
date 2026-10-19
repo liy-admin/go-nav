@@ -12,7 +12,6 @@ import {
     type Selection,
     Card,
     toast,
-    Link,
     useOverlayState,
 } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -629,20 +628,6 @@ function AdminShellContent({ children }: { children?: React.ReactNode }) {
 							</ListBox.Section>
 						))}
 					</ListBox>
-				</div>
-
-				{/* 底部信息 */}
-				<div className="border-t border-gray-100 px-5 py-4 dark:border-neutral-800">
-					<p className="text-center text-xs font-medium">
-						基于开源项目：
-						<Link
-							href="https://github.com/dengxiwang/go-nav"
-							className="text-xs text-primary"
-						>
-							github.com/dengxiwang/go-nav
-							<Link.Icon />
-						</Link>
-					</p>
 				</div>
 			</aside>
 
