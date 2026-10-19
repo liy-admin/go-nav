@@ -72,7 +72,7 @@ export const DEFAULT_NAV: NavConfig = {
 				id: "baidu",
 				name: "百度",
 				icon: "/images/baidu.svg",
-				url: "https://www.baidu.com/s?wd={query}&tn=68018901_11_oem_dg",
+				url: "https://www.baidu.com/s?wd={query}",
 			},
 			{
 				id: "bing",
@@ -94,7 +94,7 @@ export const DEFAULT_NAV: NavConfig = {
 			title: "雨云服务器",
 			description: "",
 			image: "https://blog.gotab.cn/upload/rainyun_ad.webp",
-			url: "https://www.rainyun.com/gotab_",
+			url: "https://www.rainyun.com/",
 			enabled: true,
 		},
 		{
@@ -102,7 +102,7 @@ export const DEFAULT_NAV: NavConfig = {
 			title: "云服务器首购优惠",
 			description: "云服务器、云数据库、COS、CDN、短信等云产品特惠热卖中",
 			image: "/uploads/home-ad-vjwbzt.png",
-			url: "https://www.rainyun.com/gotab_",
+			url: "https://www.rainyun.com/",
 			enabled: true,
 			placement: "home-top",
 		},
@@ -112,7 +112,7 @@ export const DEFAULT_NAV: NavConfig = {
 			description:
 				"欢迎使用 Microsoft Rewards，你可以在其中赚取积分、兑换礼品卡等",
 			image: "/uploads/home-ad-h47yxm.png",
-			url: "https://rewards.bing.com/welcome?rh=F4889091&ref=rafsrchae",
+			url: "https://rewards.bing.com/",
 			enabled: true,
 			placement: "home-top",
 		},
