@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import type { LayoutConfig } from "@/types";
-import { withAuthorBaiduTracking } from "@/lib/external-url";
+import { isScriptableUrl, withAuthorBaiduTracking } from "@/lib/external-url";
 
 export type SiteLinkMode = "intranet" | "public";
 
@@ -31,7 +31,7 @@ function isHttpUrl(url: string) {
 
 function sanitizeUrl(url: string | undefined): string {
 	const value = (url ?? "").trim();
-	if (!value) return "";
+	if (!value || isScriptableUrl(value)) return "";
 	if (
 		value.startsWith("/") ||
 		value.startsWith("./") ||

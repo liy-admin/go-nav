@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAtomValue, useSetAtom } from "jotai";
 import { HeaderBundle } from "./header-bundle";
+import { PortalNav } from "./portal/portal-home";
 import { AppSidebar } from "./app-sidebar";
 import { AppFooter } from "./app-footer";
 import { FloatingActions } from "./floating-actions";
@@ -99,16 +100,24 @@ export function AppLayout({
 				deploymentMode === "html" ? searchParams.get("site") : null,
 			setActiveId,
 		});
-	const hasDesktopSidebar = layout.showSidebar && displayCategories.length > 0;
+	const isPortal = layout.layoutStyle === "portal";
+	const hasDesktopSidebar = !isPortal && layout.showSidebar && displayCategories.length > 0;
 	const hasVisibleHomeAds =
 		!selectedEntry && !isDetailRoute && homeAdsEnabled && homeAds.length > 0;
 
 	return (
 		<div className="flex min-h-dvh flex-col">
 			<HeaderBundle showSearch={layout.showSearch} />
+			{isPortal && !selectedEntry && !isDetailRoute ? (
+				<PortalNav
+					categories={displayCategories
+						.filter((item) => !item.isChild)
+						.map((item) => item.category)}
+				/>
+			) : null}
 
 			<div className="flex min-w-0 flex-1">
-				{layout.showSidebar && displayCategories.length > 0 && (
+				{hasDesktopSidebar && (
 					<AppSidebar
 						width={sidebarWidth}
 						ads={sidebarAds}

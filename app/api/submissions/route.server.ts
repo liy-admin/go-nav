@@ -7,6 +7,7 @@ import type {
 	SubmissionInput,
 } from "@/types";
 import { requireAdminAuth } from "@/lib/server/api-auth";
+import { getClientKey, pruneRateLimitMap } from "@/lib/server/rate-limit";
 import { revalidateFrontendPaths } from "@/lib/server/revalidate-frontend";
 import {
 	createSubmission,
@@ -120,15 +121,11 @@ function parseSubmissionInput(value: unknown): SubmissionInput {
 	return input;
 }
 
-function getClientKey(req: Request): string {
-	const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-	return forwarded || req.headers.get("x-real-ip")?.trim() || "unknown";
-}
-
 function consumeRateLimit(key: string): boolean {
 	const now = Date.now();
 	const current = submissionRateLimits.get(key);
 	if (!current || current.resetAt <= now) {
+		pruneRateLimitMap(submissionRateLimits);
 		submissionRateLimits.set(key, {
 			count: 1,
 			resetAt: now + RATE_LIMIT_WINDOW,

@@ -1,4 +1,5 @@
 import type { NavCategory, NavSite, WebsiteData } from "@/types";
+import { isScriptableUrl } from "@/lib/external-url";
 
 const DEFAULT_CHILD_NAME = "默认分类";
 const FALLBACK_ROOT_NAME = "导入书签";
@@ -257,7 +258,7 @@ function findNestedList(container: Element): HTMLElement | null {
 
 function parseBookmarkLink(anchor: HTMLElement): BookmarkLink | null {
 	const url = cleanText(anchor.getAttribute("href"));
-	if (!url || /^javascript:/i.test(url)) {
+	if (!url || isScriptableUrl(url)) {
 		return null;
 	}
 

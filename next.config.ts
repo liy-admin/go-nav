@@ -41,6 +41,17 @@ const nextConfig: NextConfig = {
 						permanent: false,
 					},
 				],
+				// 后台与接口禁止被第三方页面嵌入（防点击劫持）
+				headers: async () =>
+					["/admin/:path*", "/api/:path*"].map((source) => ({
+						source,
+						headers: [
+							{ key: "X-Frame-Options", value: "SAMEORIGIN" },
+							{ key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+							{ key: "X-Content-Type-Options", value: "nosniff" },
+							{ key: "Referrer-Policy", value: "same-origin" },
+						],
+					})),
 			}
 		: {}),
 	env: {

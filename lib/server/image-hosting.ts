@@ -1265,6 +1265,19 @@ export function resolveImageHostPublicUrl(relativePath: string): string | null {
 	return joinImagePublicUrl(config.publicUrlPrefix, clean);
 }
 
+/**
+ * SVG 会被当作同源文档打开（静态 / HTML 部署没有 CSP 兜底），
+ * 自动抓取的第三方图标也会走到这里，因此拒绝带脚本能力的 SVG。
+ */
+const UNSAFE_SVG_PATTERN =
+	/<script\b|<foreignObject\b|<iframe\b|<embed\b|<object\b|<!ENTITY|\bon[a-z]+\s*=|javascript:/i;
+
+function assertSafeSvg(bytes: Buffer) {
+	if (UNSAFE_SVG_PATTERN.test(bytes.toString("utf8"))) {
+		throw new Error("SVG 中包含脚本或事件属性，出于安全原因已拒绝保存");
+	}
+}
+
 export async function saveImageAsset(
 	fileName: string,
 	bytes: Buffer,
@@ -1278,6 +1291,7 @@ export async function saveImageAsset(
 		options?.compress,
 		options?.forceWebp,
 	);
+	if (asset.ext === ".svg") assertSafeSvg(asset.bytes);
 	const preparedFileName = `${path.basename(
 		fileName,
 		path.extname(fileName),

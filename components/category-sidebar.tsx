@@ -27,6 +27,24 @@ import {
 	showCategorySearchAtom,
 	showSubcategoryTabsAtom,
 } from "@/lib/store/site";
+import type { IconType } from "react-icons";
+import {
+	LuCode,
+	LuDownload,
+	LuFacebook,
+	LuGlobe,
+	LuLayoutGrid,
+	LuMagnet,
+	LuMegaphone,
+	LuMessageSquareText,
+	LuNewspaper,
+	LuPenTool,
+	LuSearch,
+	LuShoppingCart,
+	LuSparkles,
+	LuUsers,
+	LuWrench,
+} from "react-icons/lu";
 import { IconView } from "./icon-view";
 import { SubmissionSidebarButton } from "./submission-trigger";
 
@@ -195,11 +213,6 @@ export const CategorySidebar = memo(function CategorySidebar({
 		return new Set([selectedId]);
 	}, [selectedId]);
 
-	const hasAnyIcon = useMemo(
-		() => categories.some((c) => !!c.icon),
-		[categories],
-	);
-
 	const siteCounts = useMemo(() => {
 		const map = new Map<string, number>();
 		const cats = showSubcategoryTabs ? categories : displayCategories;
@@ -365,7 +378,6 @@ export const CategorySidebar = memo(function CategorySidebar({
 									category={c}
 									isChild={isChild}
 									siteCount={siteCount}
-									hasAnyIcon={hasAnyIcon}
 									isSearchHighlighted={isSearchHighlighted}
 								/>
 							);
@@ -383,13 +395,11 @@ const CategorySidebarItem = memo(function CategorySidebarItem({
 	category,
 	isChild,
 	siteCount,
-	hasAnyIcon,
 	isSearchHighlighted,
 }: {
 	category: NavCategory;
 	isChild: boolean;
 	siteCount: number;
-	hasAnyIcon: boolean;
 	isSearchHighlighted: boolean;
 }) {
 	return (
@@ -400,20 +410,16 @@ const CategorySidebarItem = memo(function CategorySidebarItem({
 				isChild ? "pl-8 text-sm" : ""
 			} ${isSearchHighlighted ? "bg-default" : ""}`}
 		>
-			{hasAnyIcon || isChild ? (
-				<span
-					className="inline-flex h-4 w-4 shrink-0 items-center justify-center text-sm leading-none"
-					aria-hidden
-				>
-					<IconView
-						icon={category.icon}
-						size={16}
-						textClassName="w-full"
-					/>
-				</span>
-			) : (
-				<GridIcon />
-			)}
+			{category.icon ? (
+					<span
+						className="inline-flex h-4 w-4 shrink-0 items-center justify-center text-sm leading-none"
+						aria-hidden
+					>
+						<IconView icon={category.icon} size={16} textClassName="w-full" />
+					</span>
+				) : (
+					<FallbackIcon name={category.name} />
+				)}
 			<span className="flex-1 truncate">{category.name}</span>
 			{siteCount > 0 && (
 				<Chip size="sm" variant="soft" className="ml-auto">
@@ -424,52 +430,25 @@ const CategorySidebarItem = memo(function CategorySidebarItem({
 	);
 });
 
-function GridIcon() {
-	return (
-		<svg
-			width="16"
-			height="16"
-			viewBox="0 0 16 16"
-			fill="none"
-			aria-hidden
-			className="shrink-0"
-		>
-			<rect
-				x="2"
-				y="2"
-				width="5"
-				height="5"
-				rx="1"
-				stroke="currentColor"
-				strokeWidth="1.5"
-			/>
-			<rect
-				x="9"
-				y="2"
-				width="5"
-				height="5"
-				rx="1"
-				stroke="currentColor"
-				strokeWidth="1.5"
-			/>
-			<rect
-				x="2"
-				y="9"
-				width="5"
-				height="5"
-				rx="1"
-				stroke="currentColor"
-				strokeWidth="1.5"
-			/>
-			<rect
-				x="9"
-				y="9"
-				width="5"
-				height="5"
-				rx="1"
-				stroke="currentColor"
-				strokeWidth="1.5"
-			/>
-		</svg>
-	);
+const FALLBACK_ICON_RULES: Array<[RegExp, IconType]> = [
+	[/下载|app/i, LuDownload],
+	[/ai|智能/i, LuSparkles],
+	[/工具箱|实用|工具/, LuWrench],
+	[/资讯|新闻/, LuNewspaper],
+	[/推广|广告|营销/, LuMegaphone],
+	[/社媒|社交|社区/, LuUsers],
+	[/网络|vpn|代理/i, LuGlobe],
+	[/接码|短信|验证/, LuMessageSquareText],
+	[/facebook/i, LuFacebook],
+	[/google|搜索/i, LuSearch],
+	[/内容|制作|设计/, LuPenTool],
+	[/技术|开发|代码/, LuCode],
+	[/引流|获客/, LuMagnet],
+	[/电商|购物|商城/, LuShoppingCart],
+];
+
+function FallbackIcon({ name }: { name: string }) {
+	const Icon =
+		FALLBACK_ICON_RULES.find(([re]) => re.test(name))?.[1] ?? LuLayoutGrid;
+	return <Icon size={16} aria-hidden className="shrink-0" />;
 }

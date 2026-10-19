@@ -62,3 +62,6 @@ next-env.d.ts
 # 动态投稿包含访客联系方式，仅保存在部署数据目录中
 /data/submissions.json
 /data/submissions.json.lock
+
+# next dev output when NEXT_DIST_DIR=web
+/web/dev/

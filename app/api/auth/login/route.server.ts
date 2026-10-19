@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { SESSION_COOKIE, SESSION_TTL_MS, checkCredentials, createSession } from "@/lib/server/auth";
+import { createFailureLimiter, getClientKey } from "@/lib/server/rate-limit";
+
+/** 同一来源 15 分钟内最多失败 5 次 */
+const loginLimiter = createFailureLimiter(5, 15 * 60 * 1000);
 
 function isSecureRequest(req: Request): boolean {
 	const forwardedProto = req.headers
@@ -23,6 +27,15 @@ function isSecureRequest(req: Request): boolean {
  * 登录接口：POST { username, password } → 设置 httpOnly cookie
  */
 export async function POST(req: Request) {
+	const key = getClientKey(req);
+	const retryAfter = loginLimiter.retryAfter(key);
+	if (retryAfter > 0) {
+		return NextResponse.json(
+			{ error: "尝试次数过多，请稍后再试" },
+			{ status: 429, headers: { "Retry-After": String(retryAfter) } },
+		);
+	}
+
 	let username = "";
 	let password = "";
 	try {
@@ -34,8 +47,10 @@ export async function POST(req: Request) {
 	}
 
 	if (!checkCredentials(username, password)) {
+		loginLimiter.fail(key);
 		return NextResponse.json({ error: "用户名或密码错误" }, { status: 401 });
 	}
+	loginLimiter.reset(key);
 
 	const token = createSession(username);
 	const res = NextResponse.json({ ok: true });

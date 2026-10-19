@@ -1,6 +1,6 @@
 {
-  "title": "Go Nav",
-  "name": "Go Nav",
+  "title": "Lets 全网导航",
+  "name": "Lets Nav",
   "description": "简洁高效的网址导航站",
   "keywords": [
     "网址导航站",
@@ -8,30 +8,18 @@
     "网址导航",
     "个人导航"
   ],
-  "logo": "/images/logo.svg",
-  "favicon": "/favicon.ico",
-  "author": "dengxiwang",
-  "copyright": "版权所有 © 2026 GOTAB. 保留所有权利",
-  "icp": "豫ICP备2023009053号-6",
-  "beian": "豫公网安备41072402001147号",
+  "logo": "/uploads/logo-dnasbt.png",
+  "favicon": "/uploads/favicon-nstpgm.png",
+  "author": "",
+  "copyright": "",
+  "icp": "",
+  "beian": "",
   "qrCode": "https://www.gotab.cn/images/wx.webp",
   "qrCodeText": "微信扫一扫",
   "footerLinks": [
     {
-      "label": "GOTAB 官网",
-      "href": "https://www.gotab.cn"
-    },
-    {
-      "label": "作者 GitHub",
-      "href": "https://github.com/dengxiwang/go-nav"
-    },
-    {
-      "label": " GoTab 新标签页",
-      "href": "https://web.gotab.cn"
-    },
-    {
-      "label": "博客",
-      "href": "https://blog.gotab.cn"
+      "label": "LetsVPN",
+      "href": "https://letsvpnpro.app"
     }
   ],
   "themeMode": "system",
@@ -65,37 +53,11 @@
   },
   "ads": [
     {
-      "id": "ad-1778577116508",
-      "title": "雨云服务器",
-      "description": "",
-      "image": "https://blog.gotab.cn/upload/rainyun_ad.webp",
-      "url": "https://www.rainyun.com/gotab_",
-      "enabled": true
-    },
-    {
-      "id": "ad-1784451057682",
-      "title": "云服务器首购优惠",
-      "description": "云服务器、云数据库、COS、CDN、短信等云产品特惠热卖中",
-      "image": "/uploads/home-ad-vjwbzt.png",
-      "url": "https://www.rainyun.com/gotab_",
-      "enabled": true,
-      "placement": "home-top"
-    },
-    {
-      "id": "ad-1784455424365",
-      "title": "必应搜索积分兑换福利",
-      "description": "欢迎使用 Microsoft Rewards，你可以在其中赚取积分、兑换礼品卡等",
-      "image": "/uploads/home-ad-h47yxm.png",
-      "url": "https://rewards.bing.com/welcome?rh=F4889091&ref=rafsrchae",
-      "enabled": true,
-      "placement": "home-top"
-    },
-    {
       "id": "ad-1784455091300",
-      "title": "领券中心",
-      "description": "领取优惠券，购物更优惠！",
-      "image": "/uploads/home-ad-5ulsl3.png",
-      "url": "https://s.click.taobao.com/a0cbkBk",
+      "title": "LetsVPN",
+      "description": "更快，更安全，更稳定的VPN",
+      "image": "/uploads/home-ad-bfv3sy.jpg",
+      "url": "http://letsvpnpro.app/",
       "enabled": true,
       "placement": "home-top"
     }
@@ -104,20 +66,31 @@
   "layout": {
     "maxWidth": "1400",
     "showFooter": true,
-    "showFooterQrCode": true,
-    "showFloatingQrCode": true,
+    "showFooterQrCode": false,
+    "showFloatingQrCode": false,
     "showFloatingActions": true,
     "defaultIconPadding": "8",
-    "linkTarget": "new"
+    "linkTarget": "new",
+    "layoutStyle": "default",
+    "showCategorySearch": true
   },
   "adsAspectRatio": "4/3",
   "homeAdsAspectRatio": "16/9",
   "submission": {
     "enabled": true,
-    "showFloatingButton": true,
+    "showFloatingButton": false,
     "showSidebarButton": true,
-    "staticEmail": "dengxiwang@aliyun.com"
+    "staticEmail": "support@letsvpnpro.app"
   },
   "sidebarAdsEnabled": true,
-  "homeAdsEnabled": true
+  "homeAdsEnabled": true,
+  "accessProtection": {
+    "enabled": false
+  },
+  "contact": {
+    "enabled": true,
+    "items": [],
+    "title": "联系",
+    "href": "https://t.me/LetsVPNPro_Global"
+  }
 }

@@ -19,6 +19,7 @@ import {
 } from "react-icons/bi";
 import type {
 	CardStyle,
+	LayoutStyle,
 	LayoutConfig,
 	ThemeMode,
 	NavConfig,
@@ -337,8 +338,47 @@ function ThemeEditor({
 		onPatch({ layout: { ...(value.layout ?? {}), cardStyle } });
 	};
 
+	const patchLayoutStyle = (layoutStyle: LayoutStyle) => {
+		onPatch({ layout: { ...(value.layout ?? {}), layoutStyle } });
+	};
+
 	return (
 		<div className="flex flex-col gap-4">
+			<div>
+				<h3 className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
+					首页布局
+				</h3>
+				<p className="mt-1 text-xs text-gray-500 dark:text-neutral-400">
+					默认布局为左侧分类栏；门户风格取消侧栏，改为顶部分类导航，每个分类是一个带子分类标签和"更多"的板块。
+				</p>
+			</div>
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+				{(
+					[
+						{ key: "default" as LayoutStyle, label: "侧栏布局" },
+						{ key: "portal" as LayoutStyle, label: "门户风格" },
+					] as const
+				).map((item) => {
+					const active = (value.layout?.layoutStyle ?? "default") === item.key;
+					return (
+						<button
+							key={item.key}
+							type="button"
+							onClick={() => patchLayoutStyle(item.key)}
+							className={`cursor-pointer rounded-2xl border p-4 text-left text-sm font-semibold transition-all ${
+								active
+									? "border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-950/40 dark:text-blue-200"
+									: "border-gray-200 hover:border-gray-300 hover:bg-gray-50 dark:border-neutral-800 dark:hover:border-neutral-700 dark:hover:bg-neutral-900"
+							}`}
+						>
+							{item.label}
+						</button>
+					);
+				})}
+			</div>
+
+			<Separator />
+
 			<div>
 				<h3 className="text-sm font-semibold text-gray-900 dark:text-neutral-100">
 					主题模式
@@ -517,6 +557,10 @@ function FooterEditor({
 
 			<Separator />
 
+			<ContactEditor value={value} onPatch={onPatch} />
+
+			<Separator />
+
 			<div className="flex items-center justify-between">
 				<span className="text-sm font-medium">底部链接</span>
 				<Button
@@ -577,6 +621,130 @@ function FooterEditor({
 							);
 							onPatch({ footerLinks: next });
 						}}
+					>
+						删除
+					</Button>
+				</div>
+			))}
+		</div>
+	);
+}
+
+function ContactEditor({
+	value,
+	onPatch,
+}: {
+	value: NavConfig;
+	onPatch: (p: Partial<NavConfig>) => void;
+}) {
+	const contact = value.contact ?? { enabled: false, items: [] };
+	const patch = (p: Partial<typeof contact>) =>
+		onPatch({ contact: { ...contact, ...p } });
+	const patchItem = (
+		idx: number,
+		p: Partial<(typeof contact.items)[number]>,
+	) => {
+		const next = [...contact.items];
+		next[idx] = { ...next[idx], ...p };
+		patch({ items: next });
+	};
+
+	return (
+		<div className="flex flex-col gap-4">
+			<div className="flex items-center justify-between gap-3">
+				<div>
+					<div className="text-sm font-medium">悬浮联系方式</div>
+					<p className="mt-1 text-xs text-muted">
+						在页面右下角显示“联系我们”按钮，悬停或点击展开联系方式
+					</p>
+				</div>
+				<AdminSwitch
+					isSelected={contact.enabled}
+					onChange={(enabled) => patch({ enabled })}
+					ariaLabel="显示悬浮联系方式"
+				>
+					<span className="text-sm font-medium">
+						{contact.enabled ? "已开启" : "未开启"}
+					</span>
+				</AdminSwitch>
+			</div>
+
+			<div className="flex flex-col gap-2">
+				<Label className="text-sm font-medium">面板标题</Label>
+				<TextField
+					value={contact.title ?? ""}
+					onChange={(v) => patch({ title: v })}
+				>
+					<Label className="sr-only">contact title</Label>
+					<Input placeholder="联系我们" />
+				</TextField>
+			</div>
+
+			<div className="flex flex-col gap-2">
+				<Label className="text-sm font-medium">点击跳转链接</Label>
+				<TextField
+					value={contact.href ?? ""}
+					onChange={(v) => patch({ href: v })}
+				>
+					<Label className="sr-only">contact href</Label>
+					<Input placeholder="https://t.me/xxx / https://wa.me/xxx / mailto:xxx" />
+				</TextField>
+				<p className="text-xs text-muted">
+					填写后点击悬浮按钮直接新窗口打开该链接；下方联系方式会在鼠标悬停时展示
+				</p>
+			</div>
+
+			<div className="flex items-center justify-between">
+				<span className="text-sm font-medium">联系方式</span>
+				<Button
+					size="sm"
+					variant="outline"
+					onPress={() =>
+						patch({
+							items: [...contact.items, { label: "微信", value: "" }],
+						})
+					}
+				>
+					+ 添加联系方式
+				</Button>
+			</div>
+
+			{contact.items.map((item, idx) => (
+				<div key={idx} className="flex flex-wrap items-center gap-3">
+					<TextField
+						value={item.label}
+						className="w-28"
+						onChange={(v) => patchItem(idx, { label: v })}
+					>
+						<Label className="sr-only">名称</Label>
+						<Input placeholder="微信 / 邮箱" variant="secondary" />
+					</TextField>
+					<TextField
+						value={item.value}
+						className="flex-1 min-w-40"
+						onChange={(v) => patchItem(idx, { value: v })}
+					>
+						<Label className="sr-only">账号</Label>
+						<Input placeholder="账号 / 号码" variant="secondary" />
+					</TextField>
+					<TextField
+						value={item.href ?? ""}
+						className="flex-1 min-w-50"
+						onChange={(v) => patchItem(idx, { href: v })}
+					>
+						<Label className="sr-only">链接</Label>
+						<Input
+							placeholder="可选：https://t.me/xxx 或 mailto:xxx"
+							variant="secondary"
+						/>
+					</TextField>
+					<Button
+						size="sm"
+						variant="tertiary"
+						className="text-red-600 dark:text-red-400"
+						onPress={() =>
+							patch({ items: contact.items.filter((_, i) => i !== idx) })
+						}
 					>
 						删除
 					</Button>
