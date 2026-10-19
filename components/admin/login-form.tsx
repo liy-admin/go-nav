@@ -5,7 +5,6 @@ import {
 	Input,
 	InputGroup,
 	Label,
-	Link,
 	Spinner,
 	TextField,
 	toast,
@@ -168,17 +167,6 @@ export function LoginForm({
 					</div>
 				) : null}
 			</div>
-
-			<p className="text-center text-xs mt-6 font-medium">
-				基于开源项目：
-				<Link
-					href="https://github.com/dengxiwang/go-nav"
-					className="text-xs text-primary"
-				>
-					github.com/dengxiwang/go-nav
-					<Link.Icon />
-				</Link>
-			</p>
 		</div>
 	);
 }
