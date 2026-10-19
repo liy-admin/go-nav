@@ -4,7 +4,6 @@ import { Link } from "@heroui/react";
 import Image from "next/image";
 import { memo } from "react";
 import { useAtomValue } from "jotai";
-import { withAuthorBaiduTracking } from "@/lib/external-url";
 import {
 	footerLinksAtom,
 	navBeianAtom,
@@ -54,7 +53,7 @@ export const AppFooter = memo(function AppFooter({
 										return (
 											<Link
 												key={`${item.label}-${item.href}`}
-												href={withAuthorBaiduTracking(item.href)}
+												href={item.href}
 												target={isExternal ? "_blank" : undefined}
 												rel={isExternal ? "noopener noreferrer" : undefined}
 												className="inline-flex items-center gap-1 text-xs transition no-underline [@media(hover:hover)]:hover:underline"

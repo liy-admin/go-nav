@@ -14,7 +14,7 @@ Go Nav 既可以作为带登录后台的 Node.js 应用运行，也可以打包�
 
 - QQ 群：727809499
 - [加入 Go Nav QQ 交流群](https://qm.qq.com/cgi-bin/qm/qr?k=6N9Y0wlXF5txRjJcBqSYByj0fDsNwjIs&authKey=ziF+0yZBKLQB8GFFDJEHTXMaz35chgIPb88v98Vwdytvym5UlNMWOBOEwMAEHlMj&noverify=0)
-- [🔥 雨云服务器，高性价比，简洁易用的面板，值得您的信赖](https://www.rainyun.com/gotab_)
+- [🔥 雨云服务器，高性价比，简洁易用的面板，值得您的信赖](https://www.rainyun.com/)
 
 ## 在线体验
 
