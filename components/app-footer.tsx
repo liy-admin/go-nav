@@ -98,12 +98,10 @@ export const AppFooter = memo(function AppFooter({
 						<span className="inline-flex items-center gap-1 text-xs">
 							Powered by
 							<Link
-								href="https://github.com/dengxiwang/go-nav"
-								target="_blank"
-								rel="noopener noreferrer"
+								href="/"
 								className="text-xs font-semibold no-underline [@media(hover:hover)]:hover:underline [@media(hover:hover)]:hover:text-primary"
 							>
-								Go Nav
+								{name}
 							</Link>
 						</span>
 					</div>

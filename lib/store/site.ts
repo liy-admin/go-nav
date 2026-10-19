@@ -153,6 +153,7 @@ export const navIcpAtom = atom((get) => get(siteNavAtom).icp);
 export const navBeianAtom = atom((get) => get(siteNavAtom).beian);
 export const navQrCodeAtom = atom((get) => get(siteNavAtom).qrCode);
 export const navQrCodeTextAtom = atom((get) => get(siteNavAtom).qrCodeText);
+export const navContactAtom = atom((get) => get(siteNavAtom).contact);
 export const footerLinksAtom = atom(
 	(get) => get(siteNavAtom).footerLinks ?? EMPTY_FOOTER_LINKS,
 );

@@ -297,6 +297,25 @@ export interface SiteAccessProtectionConfig {
 	confirmPassword?: string;
 }
 
+/** 悬浮联系方式配置 */
+export interface ContactConfig {
+	/** 是否显示悬浮联系按钮 */
+	enabled: boolean;
+	/** 面板标题，默认"联系我们" */
+	title?: string;
+	/** 点击按钮直接跳转的链接（如 https://t.me/xxx），填写后点击按钮直接新窗口打开 */
+	href?: string;
+	/** 联系方式列表 */
+	items: Array<{
+		/** 名称，如 微信 / Telegram / 邮箱 */
+		label: string;
+		/** 显示的账号 / 号码 */
+		value: string;
+		/** 可选跳转链接，如 https://t.me/xxx、mailto:xxx */
+		href?: string;
+	}>;
+}
+
 /**
  * 导航数据配置 - nav.json 的类型定义
  * 包含：网站基础信息、搜索、广告、最近访问、布局、主题、页脚等所有后台配置
@@ -326,6 +345,8 @@ export interface NavConfig {
 	qrCode: string;
 	/** 二维码下方提示文字 */
 	qrCodeText: string;
+	/** 右下角悬浮"联系我们"按钮 */
+	contact?: ContactConfig;
 	/** 页脚友情链接 / 自定义链接 */
 	footerLinks: Array<{
 		/** 链接显示文案 */

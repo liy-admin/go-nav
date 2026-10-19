@@ -4,11 +4,12 @@ import { Button, toast } from "@heroui/react";
 import Image from "next/image";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
-import { BiBookmarkPlus } from "react-icons/bi";
+import { BiBookmarkPlus, BiSupport } from "react-icons/bi";
+import { isScriptableUrl } from "@/lib/external-url";
 import {
-	categoriesAtom,
 	hasIntranetSitesAtom,
 	layoutAtom,
+	navContactAtom,
 	navQrCodeAtom,
 	navQrCodeTextAtom,
 	submissionDialogOpenAtom,
@@ -43,15 +44,20 @@ export const FloatingActions = memo(function FloatingActions({
 	const qrCodeText = useAtomValue(navQrCodeTextAtom);
 	const layout = useAtomValue(layoutAtom);
 	const hasIntranetSites = useAtomValue(hasIntranetSitesAtom);
-	const categories = useAtomValue(categoriesAtom);
-	/** 导入的 2828.io 分类（id 以 "2828-" 开头），作为"海外网站"入口的跳转目标 */
-	const overseasCategoryId = categories.find((item) =>
-		item.id.startsWith("2828-"),
-	)?.id;
+	const contact = useAtomValue(navContactAtom);
+	const contactItems = (contact?.items ?? []).filter(
+		(item) => item.label.trim() || item.value.trim(),
+	);
+	const rawContactHref = contact?.href?.trim() ?? "";
+	const contactHref = isScriptableUrl(rawContactHref) ? "" : rawContactHref;
+	const showContact =
+		contact?.enabled === true && (contactItems.length > 0 || !!contactHref);
 	const setSubmissionOpen = useSetAtom(submissionDialogOpenAtom);
 	const autoUseIntranet = layout.autoUseIntranet === true;
 	const [showTop, setShowTop] = useState(false);
 	const [showQrPanel, setShowQrPanel] = useState(false);
+	const [showContactPanel, setShowContactPanel] = useState(false);
+	const contactContainerRef = useRef<HTMLDivElement>(null);
 	const [supportsHover, setSupportsHover] = useState(false);
 	const [siteLinkMode, setSiteLinkMode] = useState<SiteLinkMode>("public");
 	const rafRef = useRef(0);
@@ -86,6 +92,7 @@ export const FloatingActions = memo(function FloatingActions({
 			setSupportsHover(matches);
 			if (matches) {
 				setShowQrPanel(false);
+				setShowContactPanel(false);
 			}
 		};
 
@@ -121,6 +128,26 @@ export const FloatingActions = memo(function FloatingActions({
 		};
 	}, [showQrPanel]);
 
+	useEffect(() => {
+		if (!showContactPanel) return;
+
+		const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+			if (
+				contactContainerRef.current &&
+				!contactContainerRef.current.contains(event.target as Node)
+			) {
+				setShowContactPanel(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handlePointerDown);
+		document.addEventListener("touchstart", handlePointerDown);
+		return () => {
+			document.removeEventListener("mousedown", handlePointerDown);
+			document.removeEventListener("touchstart", handlePointerDown);
+		};
+	}, [showContactPanel]);
+
 	const scrollToTop = useCallback(() => {
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	}, []);
@@ -130,20 +157,15 @@ export const FloatingActions = memo(function FloatingActions({
 		setShowQrPanel((prev) => !prev);
 	}, [supportsHover]);
 
-	const goToOverseas = useCallback(() => {
-		if (!overseasCategoryId) return;
-		document
-			.getElementById(overseasCategoryId)
-			?.scrollIntoView({ behavior: "smooth", block: "start" });
-	}, [overseasCategoryId]);
+	const handleContactPress = useCallback(() => {
+		if (contactHref) {
+			window.open(contactHref, "_blank", "noopener,noreferrer");
+			return;
+		}
+		if (supportsHover) return;
+		setShowContactPanel((prev) => !prev);
+	}, [contactHref, supportsHover]);
 
-	const goToGithub = useCallback(() => {
-		window.open(
-			"https://github.com/dengxiwang/go-nav",
-			"_blank",
-			"noopener,noreferrer",
-		);
-	}, []);
 	const toggleSiteLinkMode = useCallback(() => {
 		const nextMode = siteLinkMode === "intranet" ? "public" : "intranet";
 		setStoredSiteLinkMode(nextMode);
@@ -160,6 +182,9 @@ export const FloatingActions = memo(function FloatingActions({
 	const qrPanelHoverClass = supportsHover
 		? "[@media(hover:hover)]:group-hover:pointer-events-auto [@media(hover:hover)]:group-hover:translate-x-0 [@media(hover:hover)]:group-hover:scale-100 -mr-2 [@media(hover:hover)]:group-hover:opacity-100"
 		: "";
+	const contactPanelOpenClass = showContactPanel
+		? "pointer-events-auto translate-x-0 scale-100 opacity-100"
+		: "pointer-events-none";
 	const qrPanelPositionClass =
 		`absolute bottom-0 right-[calc(100%+1.5rem)] z-10 origin-bottom-right translate-x-3 scale-[0.96] opacity-0 ${FLOATING_ACTION_TRANSITION_CLASS} ${SHARED_SPRING_EASE_CLASS} duration-260 will-change-[translate,scale,opacity] motion-reduce:translate-x-0 motion-reduce:scale-100 motion-reduce:transition-none`;
 
@@ -286,54 +311,57 @@ export const FloatingActions = memo(function FloatingActions({
 				</Button>
 			)}
 
-			{showActions && overseasCategoryId && (
-				<button
-					type="button"
-					aria-label="海外网站"
-					onClick={goToOverseas}
-					className={`group flex cursor-pointer flex-col items-center gap-1 rounded-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
-				>
-					<span
-						className={`flex size-12 items-center justify-center rounded-full bg-linear-to-br from-sky-400 to-blue-600 text-white shadow-[0_6px_16px_rgba(37,99,235,0.35)] ${FLOATING_ACTION_TRANSITION_CLASS} duration-300 [@media(hover:hover)]:group-hover:-translate-y-0.5 [@media(hover:hover)]:group-hover:shadow-[0_10px_22px_rgba(37,99,235,0.45)]`}
+			{showActions && showContact && (
+				<div ref={contactContainerRef} className="group relative flex items-center">
+					{contactItems.length > 0 && (
+					<div
+						id="floating-actions-contact-panel"
+						className={`${qrPanelPositionClass} ${contactPanelOpenClass} ${qrPanelHoverClass}`}
 					>
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							aria-hidden="true"
-							className="size-6"
-						>
-							<circle
-								cx="12"
-								cy="12"
-								r="9"
-								stroke="currentColor"
-								strokeWidth="1.8"
-							/>
-							<path
-								d="m15.8 8.2-2.1 5.5-5.5 2.1 2.1-5.5 5.5-2.1Z"
-								fill="currentColor"
-							/>
-							<circle cx="12" cy="12" r="1.1" className="fill-blue-600" />
-						</svg>
-					</span>
-					<span className="text-[11px] leading-none font-medium text-foreground/80">
-						海外网站
-					</span>
-				</button>
-			)}
+						<div className="relative w-60 rounded-2xl bg-(--primary-foreground) p-4 shadow-lg">
+							<p className="text-sm font-medium">
+								{contact?.title?.trim() || "联系我们"}
+							</p>
+							<ul className="mt-3 flex flex-col gap-2.5">
+								{contactItems.map((item, idx) => (
+									<li key={idx} className="flex items-baseline gap-2 text-xs">
+										<span className="shrink-0 text-muted">{item.label}</span>
+										{item.href?.trim() ? (
+											<a
+												href={item.href.trim()}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="min-w-0 flex-1 break-all text-right text-primary hover:underline"
+											>
+												{item.value || item.href}
+											</a>
+										) : (
+											<span className="min-w-0 flex-1 select-all break-all text-right">
+												{item.value}
+											</span>
+										)}
+									</li>
+								))}
+							</ul>
+							<div className="absolute -right-1.5 bottom-5 h-3 w-3 rotate-45 bg-(--primary-foreground)" />
+						</div>
+					</div>
+					)}
 
-			{showActions && <Button
-				size="lg"
-				isIconOnly
-				aria-label="打开项目 GitHub"
-				variant="tertiary"
-				className={`shadow bg-(--primary-foreground) rounded-full ${FLOATING_ACTION_TRANSITION_CLASS} duration-300 [@media(hover:hover)]:hover:-translate-y-0.5`}
-				onPress={goToGithub}
-			>
-				<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-					<path d="M12 1.25a10.75 10.75 0 0 0-3.4 20.95c.54.1.73-.23.73-.52v-1.84c-2.98.64-3.6-1.28-3.6-1.28-.49-1.23-1.18-1.55-1.18-1.55-.96-.65.07-.64.07-.64 1.06.07 1.62 1.08 1.62 1.08.95 1.61 2.48 1.15 3.08.88.09-.68.37-1.15.67-1.42-2.38-.27-4.88-1.18-4.88-5.28 0-1.17.42-2.12 1.1-2.87-.11-.27-.48-1.37.11-2.85 0 0 .9-.29 2.95 1.09a10.56 10.56 0 0 1 5.38 0c2.04-1.38 2.94-1.09 2.94-1.09.59 1.48.22 2.58.11 2.85.69.75 1.1 1.7 1.1 2.87 0 4.11-2.5 5-4.89 5.27.38.33.72.96.72 1.93v2.86c0 .29.19.63.74.52A10.75 10.75 0 0 0 12 1.25Z" />
-				</svg>
-			</Button>}
+					<Button
+						size="lg"
+						isIconOnly
+						aria-label={contact?.title?.trim() || "联系我们"}
+						aria-controls={contactItems.length > 0 ? "floating-actions-contact-panel" : undefined}
+						aria-expanded={showContactPanel}
+						variant="tertiary"
+						className={`shadow bg-(--primary-foreground) rounded-full ${FLOATING_ACTION_TRANSITION_CLASS} duration-300 [@media(hover:hover)]:hover:-translate-y-0.5`}
+						onPress={handleContactPress}
+					>
+						<BiSupport />
+					</Button>
+				</div>
+			)}
 
 			{showSubmission && (
 				<Button
